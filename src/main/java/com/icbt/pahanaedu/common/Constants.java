@@ -8,4 +8,5 @@ public class Constants {
 
     public final static String ACTIVE_STATUS = "ACTIVE";
     public final static String INACTIVE_STATUS = "INACTIVE";
+    public final static String DELETE_STATUS = "DELETE";
 }
