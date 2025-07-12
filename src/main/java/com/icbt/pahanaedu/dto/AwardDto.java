@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CommonDto {
-    private String status;
-    private String responseCode;
-    private String responseMessage;
+public class AwardDto {
+    private Long awardId;
+    private Long bookId;
+    private String awardName;
+    private String awardDescription;
 }

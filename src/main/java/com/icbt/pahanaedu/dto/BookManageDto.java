@@ -3,12 +3,12 @@ package com.icbt.pahanaedu.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthDetailsDto extends CommonDto {
+public class BookManageDto extends CommonDto {
     private Long userId;
-    private String username;
-    private String password;
-    private String role;
-    private String token;
+    private BookDetailsDto bookDetail;
+    private List<BookDetailsDto> bookDetailsList;
 }
