@@ -13,10 +13,7 @@ public class Promotion extends AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "promotion_id")
-    private Long awardId;
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
+    private Long promotionId;
     @Column(name = "promotion_name", nullable = false)
     private String promotionName;
     @Column(name = "promotion_start_date", nullable = false)
@@ -27,4 +24,8 @@ public class Promotion extends AbstractEntity {
     private String promotionType;
     @Column(name = "promotion_price", nullable = false)
     private BigDecimal promotionPrice;
+    @Column(name = "priority", nullable = false)
+    private Integer priority;
+    @Column(name = "promotion_status", nullable = false)
+    private String promotionStatus;
 }
