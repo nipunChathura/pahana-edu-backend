@@ -7,7 +7,6 @@ import java.util.List;
 
 @Data
 public class PromotionRequest extends Request {
-    private Long userId;
     private Long promotionId;
     private Long bookId;
     private boolean requestBookDetails;
