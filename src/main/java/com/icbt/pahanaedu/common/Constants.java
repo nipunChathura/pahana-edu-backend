@@ -9,4 +9,9 @@ public class Constants {
     public final static String ACTIVE_STATUS = "ACTIVE";
     public final static String INACTIVE_STATUS = "INACTIVE";
     public final static String DELETE_STATUS = "DELETE";
+
+    public final static String CUSTOMER_SILVER_TYPE = "SILVER";
+    public final static String CUSTOMER_GOLD_TYPE = "GOLD";
+    public final static String CUSTOMER_PLATINUM_TYPE = "PLATINUM";
+    public final static String CUSTOMER_DIAMOND_TYPE = "DIAMOND";
 }
