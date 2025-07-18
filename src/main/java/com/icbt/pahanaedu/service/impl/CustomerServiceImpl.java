@@ -56,17 +56,17 @@ public class CustomerServiceImpl implements CustomerService {
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "customerName is required");
         }
 
-        if (customerDto.getEmail() == null || customerDto.getEmail().isEmpty()) {
-            log.error(LogSupport.PROMOTION_LOG + "email is required.", "addCustomer()", customerMangeDto.getUserId());
-            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "email is required");
-        }
+
 
         if (customerDto.getPhoneNumber() == null || customerDto.getPhoneNumber().isEmpty()) {
             log.error(LogSupport.PROMOTION_LOG + "phoneNumber is required.", "addCustomer()", customerMangeDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "phoneNumber is required");
         }
 
-        validateEmail(customerDto.getEmail(), customerMangeDto.getUserId());
+        if (customerDto.getEmail() != null) {
+            validateEmail(customerDto.getEmail(), customerMangeDto.getUserId());
+        }
+
         validatePhoneNumber(customerDto.getPhoneNumber(), customerMangeDto.getUserId());
 
         Customer customer = customerMapper.toEntity(customerDto);

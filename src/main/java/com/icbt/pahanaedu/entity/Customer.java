@@ -13,7 +13,7 @@ public class Customer extends AbstractEntity {
     private Long customerId;
     @Column(name = "customer_name", nullable = false)
     private String customerName;
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", unique = true)
     private String email;
     @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
