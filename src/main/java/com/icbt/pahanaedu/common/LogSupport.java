@@ -9,4 +9,5 @@ public class LogSupport {
     public static final String CATEGORY_LOG = " [{}] userId = {} ";
     public static final String PROMOTION_LOG = " [{}] userId = {} ";
     public static final String CUSTOMER_LOG = " [{}] userId = {} ";
+    public static final String ORDER_LOG = " [{}] userId = {} customerId = {} ";
 }

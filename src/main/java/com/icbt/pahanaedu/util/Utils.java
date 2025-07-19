@@ -27,4 +27,19 @@ public class Utils {
         }
         return confTime;
     }
+
+    public static String convertMobileNumber(String number) {
+        number = number.replaceAll("[^\\d+]", "");
+
+        if (number.startsWith("+94")) {
+            return number;
+        }
+        if (number.startsWith("94")) {
+            return "+" + number;
+        }
+        if (number.startsWith("0")) {
+            return "+94" + number.substring(1);
+        }
+        return number;
+    }
 }

@@ -14,4 +14,7 @@ public class Constants {
     public final static String CUSTOMER_GOLD_TYPE = "GOLD";
     public final static String CUSTOMER_PLATINUM_TYPE = "PLATINUM";
     public final static String CUSTOMER_DIAMOND_TYPE = "DIAMOND";
+
+    public final static String PROMOTION_FLAT_TYPE = "FLAT";
+    public final static String PROMOTION_PERCENTAGE_TYPE = "PERCENTAGE";
 }
