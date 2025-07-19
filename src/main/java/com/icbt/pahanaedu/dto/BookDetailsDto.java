@@ -22,8 +22,10 @@ public class BookDetailsDto {
     private String isbn;
     private BigDecimal price;
     private boolean isPromotionEnable;
+    private Long promotionId;
     private String promotionType;
     private BigDecimal promotionPrice;
+    private BigDecimal promotionBookPrice;
     private Long quantity;
     private String imageUrl;
     private String bookStatus;

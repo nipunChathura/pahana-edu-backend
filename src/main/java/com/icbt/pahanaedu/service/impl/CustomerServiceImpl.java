@@ -56,8 +56,6 @@ public class CustomerServiceImpl implements CustomerService {
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "customerName is required");
         }
 
-
-
         if (customerDto.getPhoneNumber() == null || customerDto.getPhoneNumber().isEmpty()) {
             log.error(LogSupport.PROMOTION_LOG + "phoneNumber is required.", "addCustomer()", customerMangeDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "phoneNumber is required");
@@ -68,6 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         validatePhoneNumber(customerDto.getPhoneNumber(), customerMangeDto.getUserId());
+        customerDto.setPhoneNumber(Utils.convertMobileNumber(customerDto.getPhoneNumber()));
 
         Customer customer = customerMapper.toEntity(customerDto);
         customer.setStatus(Constants.ACTIVE_STATUS);
@@ -77,6 +76,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerRepository.save(customer);
 
+        customerMangeDto.setCustomerId(customer.getCustomerId());
         customerMangeDto.setStatus(ResponseStatus.SUCCESS.getStatus());
         customerMangeDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
         customerMangeDto.setResponseMessage("Customer saving successfully");
@@ -166,7 +166,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         if (!customerDto.getPhoneNumber().equalsIgnoreCase(customer.getPhoneNumber())) {
             validatePhoneNumber(customerDto.getPhoneNumber(), customerMangeDto.getUserId());
-            customer.setPhoneNumber(customerDto.getPhoneNumber());
+            customer.setPhoneNumber(Utils.convertMobileNumber(customerDto.getPhoneNumber()));
         }
 
         customer.setCustomerName(customerDto.getCustomerName());

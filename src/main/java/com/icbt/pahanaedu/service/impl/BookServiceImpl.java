@@ -6,15 +6,19 @@ import com.icbt.pahanaedu.common.ResponseCodes;
 import com.icbt.pahanaedu.common.ResponseStatus;
 import com.icbt.pahanaedu.dto.BookDetailsDto;
 import com.icbt.pahanaedu.dto.BookManageDto;
+import com.icbt.pahanaedu.dto.OrderDetailDto;
 import com.icbt.pahanaedu.entity.Award;
 import com.icbt.pahanaedu.entity.Book;
 import com.icbt.pahanaedu.entity.Category;
+import com.icbt.pahanaedu.entity.Promotion;
 import com.icbt.pahanaedu.exception.InvalidRequestException;
 import com.icbt.pahanaedu.mapping.AwardMapper;
 import com.icbt.pahanaedu.mapping.BookMapper;
+import com.icbt.pahanaedu.mapping.PromotionMapper;
 import com.icbt.pahanaedu.repository.AwardRepository;
 import com.icbt.pahanaedu.repository.BookRepository;
 import com.icbt.pahanaedu.repository.CategoryRepository;
+import com.icbt.pahanaedu.repository.PromotionRepository;
 import com.icbt.pahanaedu.service.BookService;
 import com.icbt.pahanaedu.util.Utils;
 import org.slf4j.Logger;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +51,12 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     private AwardRepository awardRepository;
+
+    @Autowired
+    private PromotionRepository promotionRepository;
+
+    @Autowired
+    private PromotionMapper promotionMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -252,6 +263,7 @@ public class BookServiceImpl implements BookService {
 
         Book book = optionalBook.get();
         BookDetailsDto bookMapperDto = bookMapper.toDto(book);
+        bookMapperDto.setCategoryId(book.getCategory().getCategoryId());
         bookMapperDto.setCategoryName(book.getCategory().getCategoryName());
 
         List<Award> awardList = awardRepository.findByBook(book);
@@ -260,6 +272,7 @@ public class BookServiceImpl implements BookService {
         }
 
         // TODO: 7/11/2025 set promotion
+        setPromotion(bookMapperDto.getBookId(), book.getPrice(), bookMapperDto);
 
         bookManageDto.setBookDetail(bookMapperDto);
         bookManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
@@ -268,6 +281,23 @@ public class BookServiceImpl implements BookService {
 
         log.info(LogSupport.BOOK_LOG + "end.", "getBookById()", bookManageDto.getUserId());
         return bookManageDto;
+    }
+
+    private void setPromotion(Long bookId, BigDecimal bookPrice, BookDetailsDto bookDetailsDto) {
+        List<Promotion> activePromotionByBookNow = promotionRepository.getActivePromotionByBookNow(bookId);
+        if (!activePromotionByBookNow.isEmpty()) {
+            Promotion activePromotion = activePromotionByBookNow.get(0);
+            bookDetailsDto.setPromotionEnable(true);
+            bookDetailsDto.setPromotionId(activePromotion.getPromotionId());
+            bookDetailsDto.setPromotionType(activePromotion.getPromotionType());
+            BigDecimal promotionPrice = activePromotion.getPromotionPrice();
+            bookDetailsDto.setPromotionPrice(promotionPrice);
+            if (activePromotion.getPromotionType().equalsIgnoreCase(Constants.PROMOTION_FLAT_TYPE)) {
+                bookDetailsDto.setPromotionBookPrice(BigDecimal.valueOf(bookPrice.doubleValue()-promotionPrice.doubleValue()));
+            } else if (activePromotion.getPromotionType().equalsIgnoreCase(Constants.PROMOTION_PERCENTAGE_TYPE)) {
+                bookDetailsDto.setPromotionBookPrice(BigDecimal.valueOf(bookPrice.doubleValue() - (bookPrice.doubleValue() * promotionPrice.doubleValue())));
+            }
+        }
     }
 
     @Override
@@ -294,6 +324,7 @@ public class BookServiceImpl implements BookService {
                 }
 
                 // TODO: 7/11/2025 set promotion
+                setPromotion(mapperDto.getBookId(), book.getPrice(), mapperDto);
                 bookDetailsDtoList.add(mapperDto);
             }
         });
