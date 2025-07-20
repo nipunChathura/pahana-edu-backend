@@ -9,7 +9,7 @@ import com.icbt.pahanaedu.dto.CustomerMangeDto;
 import com.icbt.pahanaedu.entity.Customer;
 import com.icbt.pahanaedu.entity.MembershipType;
 import com.icbt.pahanaedu.exception.InvalidRequestException;
-import com.icbt.pahanaedu.mapping.CustomerMapper;
+import com.icbt.pahanaedu.util.mapper.CustomerMapper;
 import com.icbt.pahanaedu.repository.CustomerRepository;
 import com.icbt.pahanaedu.service.CustomerService;
 import com.icbt.pahanaedu.util.Utils;

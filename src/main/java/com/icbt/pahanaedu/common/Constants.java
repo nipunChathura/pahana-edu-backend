@@ -5,6 +5,10 @@ public class Constants {
     public final static String TIME_ZONE = "Asia/Colombo";
 
     public final static String ROLE = "ROLE_";
+    public final static String ROLE_SYSTEM = "SYSTEM";
+    public final static String ROLE_ADMIN = "ADMIN";
+
+    public final static String DELETE_USER_FORMAT = "DELETE_";
 
     public final static String ACTIVE_STATUS = "ACTIVE";
     public final static String INACTIVE_STATUS = "INACTIVE";
@@ -17,4 +21,11 @@ public class Constants {
 
     public final static String PROMOTION_FLAT_TYPE = "FLAT";
     public final static String PROMOTION_PERCENTAGE_TYPE = "PERCENTAGE";
+
+    public final static String USER_INITIATE_STATUS = "INITIATE";
+    public final static String USER_NOT_APPROVED_STATUS = "NOT_APPROVED";
+    public final static String USER_ACTIVE_STATUS = "ACTIVE";
+    public final static String USER_INACTIVE_STATUS = "INACTIVE";
+    public final static String USER_BLOCKED_STATUS = "BLOCKED";
+    public final static String USER_DELETE_STATUS = "DELETE";
 }

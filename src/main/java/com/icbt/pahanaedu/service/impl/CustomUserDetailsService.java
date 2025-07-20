@@ -1,5 +1,6 @@
 package com.icbt.pahanaedu.service.impl;
 
+import com.icbt.pahanaedu.common.Constants;
 import com.icbt.pahanaedu.entity.User;
 import com.icbt.pahanaedu.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndStatusNot(username, Constants.USER_DELETE_STATUS)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return new org.springframework.security.core.userdetails.User(
