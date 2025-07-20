@@ -8,7 +8,7 @@ import com.icbt.pahanaedu.dto.CategoryDto;
 import com.icbt.pahanaedu.dto.CategoryManageDto;
 import com.icbt.pahanaedu.entity.Category;
 import com.icbt.pahanaedu.exception.InvalidRequestException;
-import com.icbt.pahanaedu.mapping.CategoryMapper;
+import com.icbt.pahanaedu.util.mapper.CategoryMapper;
 import com.icbt.pahanaedu.repository.CategoryRepository;
 import com.icbt.pahanaedu.service.CategoryService;
 import com.icbt.pahanaedu.util.Utils;

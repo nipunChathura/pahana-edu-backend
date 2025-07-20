@@ -28,6 +28,16 @@ public class GlobalExceptionHandler {
         return response;
     }
 
+    @ExceptionHandler(InvalidRequestException.class)
+    @ResponseBody
+    public Response handleInvalidRequestException(InvalidRequestException ex) {
+        Response response = new Response();
+        response.setStatus(ResponseStatus.FAILURE.getStatus());
+        response.setResponseMessage(ex.getMessage());
+        response.setResponseCode(ex.getCode());
+        return response;
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Response handleGlobalException(Exception ex) {
@@ -39,13 +49,5 @@ public class GlobalExceptionHandler {
         return response;
     }
 
-    @ExceptionHandler(InvalidRequestException.class)
-    @ResponseBody
-    public Response handleInvalidRequestException(InvalidRequestException ex) {
-        Response response = new Response();
-        response.setStatus(ResponseStatus.FAILURE.getStatus());
-        response.setResponseMessage(ex.getMessage());
-        response.setResponseCode(ex.getCode());
-        return response;
-    }
+
 }

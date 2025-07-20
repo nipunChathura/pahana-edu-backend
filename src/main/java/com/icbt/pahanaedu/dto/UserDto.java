@@ -5,11 +5,11 @@ import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthDetailsDto extends CommonDto {
+public class UserDto {
     private Long userId;
     private String username;
     private String password;
     private String role;
-    private String token;
-    private String userStatus;
+    private String status;
+    private boolean isSystemUser;
 }

@@ -1,4 +1,4 @@
-package com.icbt.pahanaedu.mapping;
+package com.icbt.pahanaedu.util.mapper;
 
 import com.icbt.pahanaedu.dto.OrderDto;
 import com.icbt.pahanaedu.entity.Order;

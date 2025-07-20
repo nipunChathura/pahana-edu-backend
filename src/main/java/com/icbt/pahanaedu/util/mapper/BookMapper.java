@@ -1,4 +1,4 @@
-package com.icbt.pahanaedu.mapping;
+package com.icbt.pahanaedu.util.mapper;
 
 import com.icbt.pahanaedu.dto.BookDetailsDto;
 import com.icbt.pahanaedu.entity.Book;

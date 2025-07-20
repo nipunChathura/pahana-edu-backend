@@ -14,11 +14,14 @@ public class User extends AbstractEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
     @Column(name = "password", nullable = false)
     private String password;
     @Column(name = "role", nullable = false)
     private String role;
-
+    @Column(name = "status", nullable = false)
+    private String status;
+    @Column(name = "is_system_user", nullable = false)
+    private boolean isSystemUser;
 }
