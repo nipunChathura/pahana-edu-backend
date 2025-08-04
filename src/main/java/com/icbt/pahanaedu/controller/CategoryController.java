@@ -47,6 +47,21 @@ public class CategoryController {
         return response;
     }
 
+    @DeleteMapping("/delete")
+    public CategoryResponse deleteCategory(@RequestBody CategoryRequest request) {
+        CategoryManageDto categoryManageDto = new CategoryManageDto();
+        BeanUtils.copyProperties(request, categoryManageDto);
+
+        CategoryManageDto result = categoryService.deleteCategory(categoryManageDto);
+        CategoryResponse response = new CategoryResponse();
+        response.setCategoryDetail(result.getCategoryDetail());
+        response.setStatus(result.getStatus());
+        response.setResponseCode(result.getResponseCode());
+        response.setResponseMessage(result.getResponseMessage());
+
+        return response;
+    }
+
     @GetMapping("/id")
     public CategoryResponse getCategoryById(@RequestParam Long categoryId, @RequestParam Long userId) {
         CategoryManageDto categoryManageDto = new CategoryManageDto();

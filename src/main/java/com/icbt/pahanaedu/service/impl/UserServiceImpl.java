@@ -226,6 +226,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setUsername(Constants.DELETE_USER_FORMAT + user.getUsername());
+        user.setStatus(Constants.USER_DELETE_STATUS);
 
         userRepository.save(user);
 

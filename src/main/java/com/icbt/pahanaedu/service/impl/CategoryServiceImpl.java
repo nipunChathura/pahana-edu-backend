@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,15 +35,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryManageDto addCategory(CategoryManageDto categoryManageDto) {
-        log.info(LogSupport.BOOK_LOG + "starting.", "addCategory()", categoryManageDto.getUserId());
+        log.info(LogSupport.CATEGORY_LOG + "starting.", "addCategory()", categoryManageDto.getUserId());
         if (categoryManageDto.getCategoryDetail() == null) {
-            log.error(LogSupport.BOOK_LOG + "category data is required.", "addCategory()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "category data is required.", "addCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "category data  is required");
         }
         CategoryDto categoryDetail = categoryManageDto.getCategoryDetail();
 
         if (categoryDetail.getCategoryName() == null || categoryDetail.getCategoryName().isEmpty()) {
-            log.error(LogSupport.BOOK_LOG + "name is required.", "addCategory()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "name is required.", "addCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "name is required");
         }
 
@@ -59,36 +60,39 @@ public class CategoryServiceImpl implements CategoryService {
         categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
         categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
         categoryManageDto.setResponseMessage("Category saving successfully");
-        log.info(LogSupport.BOOK_LOG + "end.", "addCategory()", categoryManageDto.getUserId());
+        log.info(LogSupport.CATEGORY_LOG + "end.", "addCategory()", categoryManageDto.getUserId());
         return categoryManageDto;
     }
 
     @Override
+    @Transactional
     public CategoryManageDto updateCategory(CategoryManageDto categoryManageDto) {
-        log.info(LogSupport.BOOK_LOG + "starting.", "updateCategory()", categoryManageDto.getUserId());
+        log.info(LogSupport.CATEGORY_LOG + "starting.", "updateCategory()", categoryManageDto.getUserId());
         if (categoryManageDto.getCategoryDetail() == null) {
-            log.error(LogSupport.BOOK_LOG + "category data is required.", "updateCategory()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "category data is required.", "updateCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "category data  is required");
         }
         CategoryDto categoryDetail = categoryManageDto.getCategoryDetail();
 
         if (categoryDetail.getCategoryId() == null) {
-            log.error(LogSupport.BOOK_LOG + "categoryId is required.", "updateCategory()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "categoryId is required.", "updateCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "categoryId is required");
         }
 
         Optional<Category> optionalCategory = categoryRepository.findById(categoryDetail.getCategoryId());
         if (optionalCategory.isEmpty()) {
-            log.error(LogSupport.BOOK_LOG + "invalid categoryId.", "updateCategory()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "invalid categoryId.", "updateCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.INVALID_CATEGORY_ID_CODE, "Invalid Category Id");
         }
 
         if (categoryDetail.getCategoryName() == null || categoryDetail.getCategoryName().isEmpty()) {
-            log.error(LogSupport.BOOK_LOG + "categoryName is required.", "updateCategory()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "categoryName is required.", "updateCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "categoryName is required");
         }
 
-        Category category = categoryMapper.toEntity(categoryDetail);
+        Category category = optionalCategory.get();
+        category.setCategoryName(categoryDetail.getCategoryName());
+        category.setCategoryStatus(categoryDetail.getCategoryStatus());
         category.setModifiedBy(categoryManageDto.getUserId());
         category.setModifiedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
 
@@ -99,27 +103,66 @@ public class CategoryServiceImpl implements CategoryService {
         categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
         categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
         categoryManageDto.setResponseMessage("Category updating successfully");
-        log.info(LogSupport.BOOK_LOG + "end.", "updateCategory()", categoryManageDto.getUserId());
+        log.info(LogSupport.CATEGORY_LOG + "end.", "updateCategory()", categoryManageDto.getUserId());
         return categoryManageDto;
     }
 
     @Override
-    public CategoryManageDto getCategoryById(CategoryManageDto categoryManageDto) {
-        log.info(LogSupport.BOOK_LOG + "starting.", "getCategoryById()", categoryManageDto.getUserId());
+    public CategoryManageDto deleteCategory(CategoryManageDto categoryManageDto) {
+        log.info(LogSupport.CATEGORY_LOG + "starting.", "deleteCategory()", categoryManageDto.getUserId());
+
         if (categoryManageDto.getCategoryDetail() == null) {
-            log.error(LogSupport.BOOK_LOG + "category data is required.", "getCategoryById()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "category data is required.", "deleteCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "category data  is required");
         }
         CategoryDto categoryDetail = categoryManageDto.getCategoryDetail();
 
         if (categoryDetail.getCategoryId() == null) {
-            log.error(LogSupport.BOOK_LOG + "categoryId is required.", "getCategoryById()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "categoryId is required.", "deleteCategory()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "categoryId is required");
         }
 
         Optional<Category> optionalCategory = categoryRepository.findById(categoryDetail.getCategoryId());
         if (optionalCategory.isEmpty()) {
-            log.error(LogSupport.BOOK_LOG + "invalid categoryId.", "getCategoryById()", categoryManageDto.getUserId());
+            log.error(LogSupport.CATEGORY_LOG + "invalid categoryId.", "deleteCategory()", categoryManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.INVALID_CATEGORY_ID_CODE, "Invalid Category Id");
+        }
+
+        Category category = optionalCategory.get();
+        category.setCategoryStatus(Constants.DELETE_STATUS);
+        category.setModifiedBy(categoryManageDto.getUserId());
+        category.setModifiedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+
+
+        categoryRepository.save(category);
+
+        categoryDetail.setCategoryId(category.getCategoryId());
+        categoryManageDto.setCategoryDetail(categoryDetail);
+        categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
+        categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
+        categoryManageDto.setResponseMessage("Category delete successfully");
+
+        log.info(LogSupport.CATEGORY_LOG + "end.", "deleteCategory()", categoryManageDto.getUserId());
+        return categoryManageDto;
+    }
+
+    @Override
+    public CategoryManageDto getCategoryById(CategoryManageDto categoryManageDto) {
+        log.info(LogSupport.CATEGORY_LOG + "starting.", "getCategoryById()", categoryManageDto.getUserId());
+        if (categoryManageDto.getCategoryDetail() == null) {
+            log.error(LogSupport.CATEGORY_LOG + "category data is required.", "getCategoryById()", categoryManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "category data  is required");
+        }
+        CategoryDto categoryDetail = categoryManageDto.getCategoryDetail();
+
+        if (categoryDetail.getCategoryId() == null) {
+            log.error(LogSupport.CATEGORY_LOG + "categoryId is required.", "getCategoryById()", categoryManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "categoryId is required");
+        }
+
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryDetail.getCategoryId());
+        if (optionalCategory.isEmpty()) {
+            log.error(LogSupport.CATEGORY_LOG + "invalid categoryId.", "getCategoryById()", categoryManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.INVALID_CATEGORY_ID_CODE, "Invalid Category Id");
         }
 
@@ -129,19 +172,19 @@ public class CategoryServiceImpl implements CategoryService {
         categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
         categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
         categoryManageDto.setResponseMessage("Category finding successfully");
-        log.info(LogSupport.BOOK_LOG + "end.", "getCategoryById()", categoryManageDto.getUserId());
+        log.info(LogSupport.CATEGORY_LOG + "end.", "getCategoryById()", categoryManageDto.getUserId());
         return categoryManageDto;
     }
 
     @Override
     public CategoryManageDto getCategories(CategoryManageDto categoryManageDto) {
-        log.info(LogSupport.BOOK_LOG + "starting.", "getCategories()", categoryManageDto.getUserId());
+        log.info(LogSupport.CATEGORY_LOG + "starting.", "getCategories()", categoryManageDto.getUserId());
 
         List<CategoryDto> categoryDtos = new ArrayList<>();
 
         List<Category> categories = categoryRepository.findAll();
         if (categories.isEmpty()) {
-            log.info(LogSupport.BOOK_LOG + "categories is empty.", "getCategories()", categoryManageDto.getUserId());
+            log.info(LogSupport.CATEGORY_LOG + "categories is empty.", "getCategories()", categoryManageDto.getUserId());
             categoryManageDto.setCategoryDetailsList(categoryDtos);
             categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
             categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
@@ -150,7 +193,9 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categories.forEach(category -> {
-            if (category.getCategoryStatus().equalsIgnoreCase(Constants.ACTIVE_STATUS)) {
+            if (category.getCategoryStatus().equalsIgnoreCase(Constants.ACTIVE_STATUS)
+                || category.getCategoryStatus().equalsIgnoreCase(Constants.INACTIVE_STATUS)) {
+
                 categoryDtos.add(categoryMapper.toDto(category));
             }
         });
@@ -159,7 +204,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
         categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
         categoryManageDto.setResponseMessage("Category getting successfully");
-        log.info(LogSupport.BOOK_LOG + "end.", "getCategories()", categoryManageDto.getUserId());
+        log.info(LogSupport.CATEGORY_LOG + "end.", "getCategories()", categoryManageDto.getUserId());
         return categoryManageDto;
     }
 }
