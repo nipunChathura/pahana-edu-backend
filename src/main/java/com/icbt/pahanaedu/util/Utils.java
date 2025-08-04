@@ -7,9 +7,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Utils {
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
+
+    private static final String PREFIX = "CUST";
+    private static final AtomicInteger counter = new AtomicInteger(0);
 
     public static Date getCurrentDateByTimeZone(String timeZone) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
@@ -41,5 +45,14 @@ public class Utils {
             return "+94" + number.substring(1);
         }
         return number;
+    }
+
+    public static String generateCustomerRegNumber(Long sequence) {
+        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        return PREFIX + "-" + date + "-" + String.format("%03d", sequence + 1);
+    }
+
+    public static String getCurrentDate() {
+        return new SimpleDateFormat("yyyyMMdd").format(new Date());
     }
 }

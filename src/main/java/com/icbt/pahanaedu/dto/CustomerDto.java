@@ -7,6 +7,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomerDto {
     private Long customerId;
+    private String customerRegNo;
     private String customerName;
     private String email;
     private String phoneNumber;

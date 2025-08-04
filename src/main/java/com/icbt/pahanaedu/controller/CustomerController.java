@@ -1,6 +1,7 @@
 package com.icbt.pahanaedu.controller;
 
 import com.icbt.pahanaedu.dto.CustomerMangeDto;
+import com.icbt.pahanaedu.request.CategoryRequest;
 import com.icbt.pahanaedu.request.CustomerRequest;
 import com.icbt.pahanaedu.response.CustomerResponse;
 import com.icbt.pahanaedu.service.CustomerService;
@@ -72,6 +73,21 @@ public class CustomerController {
 
         CustomerResponse response = new CustomerResponse();
         response.setCustomerDtoList(result.getCustomerDtoList());
+        response.setStatus(result.getStatus());
+        response.setResponseCode(result.getResponseCode());
+        response.setResponseMessage(result.getResponseMessage());
+
+        return response;
+    }
+
+    @DeleteMapping("/delete")
+    public CustomerResponse deleteCustomer(@RequestBody CustomerRequest request) {
+        CustomerMangeDto customerMangeDto = new CustomerMangeDto();
+        BeanUtils.copyProperties(request, customerMangeDto);
+
+        CustomerMangeDto result = customerService.deleteCustomer(customerMangeDto);
+
+        CustomerResponse response = new CustomerResponse();
         response.setStatus(result.getStatus());
         response.setResponseCode(result.getResponseCode());
         response.setResponseMessage(result.getResponseMessage());
