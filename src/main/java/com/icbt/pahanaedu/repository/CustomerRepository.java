@@ -10,4 +10,6 @@ import java.util.List;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findAllByEmail(String email);
     List<Customer> findAllByPhoneNumber(String phoneNumber);
+
+    int countByCustomerRegNoStartingWith(String prefix);
 }

@@ -11,6 +11,8 @@ public class Customer extends AbstractEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
     private Long customerId;
+    @Column(name = "customer_reg_no", nullable = false, unique = true)
+    private String customerRegNo;
     @Column(name = "customer_name", nullable = false)
     private String customerName;
     @Column(name = "email", unique = true)
