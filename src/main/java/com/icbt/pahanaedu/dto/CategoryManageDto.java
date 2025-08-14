@@ -10,5 +10,6 @@ import java.util.List;
 public class CategoryManageDto extends CommonDto {
     private Long userId;
     private CategoryDto categoryDetail;
+    private String categoryStatus;
     private List<CategoryDto> categoryDetailsList;
 }

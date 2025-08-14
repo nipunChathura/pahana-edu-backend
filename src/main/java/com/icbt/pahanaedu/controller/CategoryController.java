@@ -94,4 +94,20 @@ public class CategoryController {
 
         return response;
     }
+
+    @GetMapping("/status")
+    public CategoryResponse getCategories(@RequestParam Long userId, @RequestParam String status) {
+        CategoryManageDto categoryManageDto = new CategoryManageDto();
+        categoryManageDto.setUserId(userId);
+        categoryManageDto.setCategoryStatus(status);
+
+        CategoryManageDto result = categoryService.getCategoriesByStatus(categoryManageDto);
+        CategoryResponse response = new CategoryResponse();
+        response.setCategoryDetailsList(result.getCategoryDetailsList());
+        response.setStatus(result.getStatus());
+        response.setResponseCode(result.getResponseCode());
+        response.setResponseMessage(result.getResponseMessage());
+
+        return response;
+    }
 }

@@ -5,9 +5,12 @@ import com.icbt.pahanaedu.dto.BookManageDto;
 import com.icbt.pahanaedu.request.BookRequest;
 import com.icbt.pahanaedu.response.BookResponse;
 import com.icbt.pahanaedu.service.BookService;
+import com.icbt.pahanaedu.service.impl.GcpStorageServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/books")
