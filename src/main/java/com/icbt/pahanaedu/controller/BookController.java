@@ -61,6 +61,8 @@ public class BookController {
         BookManageDto result = bookService.getBookById(bookManageDto);
         BookResponse response = new BookResponse();
         response.setBookDetail(result.getBookDetail());
+        System.out.println("response.getBookDetail() = " + response.getBookDetail());
+        System.out.println("response.getBookDetail().getAwardList() = " + response.getBookDetail().getAwardList());
         response.setStatus(result.getStatus());
         response.setResponseCode(result.getResponseCode());
         response.setResponseMessage(result.getResponseMessage());
@@ -70,13 +72,26 @@ public class BookController {
 
     @GetMapping("/{userId}")
     public BookResponse getBookAll(@PathVariable  Long userId) {
-        System.out.println("userId = " + userId);
         BookManageDto bookManageDto = new BookManageDto();
         bookManageDto.setUserId(userId);
 
         BookManageDto result = bookService.getBooks(bookManageDto);
         BookResponse response = new BookResponse();
         response.setBookDetailsList(result.getBookDetailsList());
+        response.setStatus(result.getStatus());
+        response.setResponseCode(result.getResponseCode());
+        response.setResponseMessage(result.getResponseMessage());
+
+        return response;
+    }
+
+    @DeleteMapping("/delete")
+    public BookResponse deleteBook(@RequestBody  BookRequest request) {
+        BookManageDto bookManageDto = new BookManageDto();
+        BeanUtils.copyProperties(request, bookManageDto);
+
+        BookManageDto result = bookService.deleteBooks(bookManageDto);
+        BookResponse response = new BookResponse();
         response.setStatus(result.getStatus());
         response.setResponseCode(result.getResponseCode());
         response.setResponseMessage(result.getResponseMessage());
