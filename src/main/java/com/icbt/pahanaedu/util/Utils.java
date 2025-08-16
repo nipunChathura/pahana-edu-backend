@@ -1,10 +1,14 @@
 package com.icbt.pahanaedu.util;
 
+import com.icbt.pahanaedu.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,6 +54,15 @@ public class Utils {
     public static String generateCustomerRegNumber(Long sequence) {
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
         return PREFIX + "-" + date + "-" + String.format("%03d", sequence + 1);
+    }
+
+    public static Date convetPromotionDate(Date date) {
+        Instant instant = date.toInstant();
+
+        ZoneId sriLankaZone = ZoneId.of(Constants.TIME_ZONE);
+        ZonedDateTime zonedDateTime = instant.atZone(sriLankaZone);
+
+        return Date.from(zonedDateTime.toInstant());
     }
 
     public static String getCurrentDate() {

@@ -64,6 +64,20 @@ public class PromotionController {
         return response;
     }
 
+    @DeleteMapping("/delete")
+    public PromotionResponse deletePromotion(@RequestBody PromotionRequest request) {
+        PromotionManageDto promotionManageDto = new PromotionManageDto();
+        BeanUtils.copyProperties(request, promotionManageDto);
+
+        PromotionManageDto result = promotionService.deletePromotion(promotionManageDto);
+        PromotionResponse response = new PromotionResponse();
+        response.setStatus(result.getStatus());
+        response.setResponseCode(result.getResponseCode());
+        response.setResponseMessage(result.getResponseMessage());
+
+        return response;
+    }
+
     @GetMapping("/all/{userId}")
     public PromotionResponse getAllPromotion(@PathVariable Long userId,
                                              @RequestParam boolean requestBookDetails) {

@@ -99,8 +99,17 @@ public class PromotionServiceImpl implements PromotionService {
             log.error(LogSupport.PROMOTION_LOG + "bookIds is validation failed.", "addPromotion()", promotionManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "bookIds is validation failed.");
         }
+        System.out.println("books.size() = " + books.size());
+        books.forEach(book -> {
+            System.out.println("book = " + book);
+        });
+
+        System.out.println("promotionDto.getPromotionStartDate = " + promotionDto.getPromotionStartDate());
+        System.out.println("promotionDto.getPromotionEndDate = " + promotionDto.getPromotionEndDate());
 
         Promotion promotion = promotionMapper.toEntity(promotionDto);
+        promotion.setPromotionStartDate(Utils.convetPromotionDate(promotionDto.getPromotionStartDate()));
+        promotion.setPromotionEndDate(Utils.convetPromotionDate(promotionDto.getPromotionEndDate()));
         promotion.setCreatedBy(promotionManageDto.getUserId());
         promotion.setPromotionStatus(Constants.ACTIVE_STATUS);
         promotion.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
@@ -184,9 +193,26 @@ public class PromotionServiceImpl implements PromotionService {
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "promotionStatus is required");
         }
 
+        List<Long> bookIds = promotionDto.getBookIds();
+        System.out.println("bookIds.size() = " + bookIds.size());
+        List<PromotionBook> promotionBooks = promotionBookRepository.findAllByPromotion(promotion);
+        promotionBookRepository.deleteAll(promotionBooks);
+
+        if (!bookIds.isEmpty()) {
+            List<Book> books = validateBookIds(promotionDto.getBookIds(), promotionManageDto.getUserId());
+            books.forEach(book -> {
+                PromotionBook promotionBook = new PromotionBook();
+                promotionBook.setPromotion(promotion);
+                promotionBook.setBook(book);
+                promotionBook.setStatus(Constants.ACTIVE_STATUS);
+
+                promotionBookRepository.save(promotionBook);
+            });
+        }
+
         promotion.setPromotionName(promotionDto.getPromotionName());
-        promotion.setPromotionStartDate(promotionDto.getPromotionStartDate());
-        promotion.setPromotionEndDate(promotionDto.getPromotionEndDate());
+        promotion.setPromotionStartDate(Utils.convetPromotionDate(promotionDto.getPromotionStartDate()));
+        promotion.setPromotionEndDate(Utils.convetPromotionDate(promotionDto.getPromotionEndDate()));
         promotion.setPromotionStatus(promotionDto.getPromotionStatus());
         promotion.setModifiedBy(promotionManageDto.getUserId());
         promotion.setModifiedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
@@ -234,6 +260,36 @@ public class PromotionServiceImpl implements PromotionService {
         promotionManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
         promotionManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
         promotionManageDto.setResponseMessage("Promotion getting successfully");
+        log.info(LogSupport.PROMOTION_LOG + "end.", "getByPromotionId()", promotionManageDto.getUserId());
+
+        return promotionManageDto;
+    }
+
+    @Override
+    public PromotionManageDto deletePromotion(PromotionManageDto promotionManageDto) {
+        log.info(LogSupport.PROMOTION_LOG + "starting.", "deletePromotion()", promotionManageDto.getUserId());
+
+        if (promotionManageDto.getPromotionId() == null) {
+            log.error(LogSupport.PROMOTION_LOG + "promotionId is required.", "deletePromotion()", promotionManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "promotionId is required");
+        }
+
+        Optional<Promotion> byId = promotionRepository.findById(promotionManageDto.getPromotionId());
+        if (byId.isEmpty()) {
+            log.error(LogSupport.PROMOTION_LOG + "invalid promotion id.", "deletePromotion()", promotionManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.INVALID_PROMOTION_ID_CODE, "invalid promotion id");
+        }
+
+        Promotion promotion = byId.get();
+        promotion.setPromotionStatus(Constants.DELETE_STATUS);
+        promotion.setModifiedBy(promotionManageDto.getUserId());
+        promotion.setModifiedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+
+        promotionRepository.save(promotion);
+
+        promotionManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
+        promotionManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
+        promotionManageDto.setResponseMessage("Promotion delete successfully");
         log.info(LogSupport.PROMOTION_LOG + "end.", "getByPromotionId()", promotionManageDto.getUserId());
 
         return promotionManageDto;
