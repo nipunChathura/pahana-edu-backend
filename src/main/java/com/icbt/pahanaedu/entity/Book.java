@@ -36,6 +36,8 @@ public class Book extends AbstractEntity {
     private BigDecimal price;
     @Column(name = "quantity", nullable = false)
     private Long quantity;
+    @Column(name = "loading_quantity", nullable = false)
+    private Long loadingQuantity;
     @Column(name = "imageUrl", nullable = false)
     private String imageUrl;
     @Column(name = "book_status")

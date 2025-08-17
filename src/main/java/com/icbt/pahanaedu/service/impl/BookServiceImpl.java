@@ -122,6 +122,7 @@ public class BookServiceImpl implements BookService {
         }
 
         Book book = bookMapper.toEntity(bookDetailsDto);
+        book.setLoadingQuantity(book.getQuantity());
         book.setCategory(category);
         book.setBookStatus(Constants.ACTIVE_STATUS);
         book.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
