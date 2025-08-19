@@ -17,4 +17,11 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
             "    and current_timestamp between p.promotionStartDate and p.promotionEndDate " +
             "    order by p.createdDatetime")
     List<Promotion> getActivePromotionByBookNow(@Param("bookId") Long bookId);
+
+    @Query("select p from Promotion p " +
+            "    inner join PromotionBook pb on p.promotionId = pb.promotionBookId " +
+            "where p.promotionStatus = 'ACTIVE' " +
+            "    and current_timestamp between p.promotionStartDate and p.promotionEndDate " +
+            "    order by p.createdDatetime")
+    List<Promotion> getActivePromotionNow();
 }

@@ -24,4 +24,6 @@ public class Customer extends AbstractEntity {
     private MembershipType membershipType;
     @Column(name = "status")
     private String status;
+    @Column(name = "picture")
+    private String picture;
 }

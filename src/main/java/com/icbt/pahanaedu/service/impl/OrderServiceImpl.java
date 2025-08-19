@@ -162,7 +162,6 @@ public class OrderServiceImpl implements OrderService {
             orderDetailRepository.save(orderDetail);
         });
 
-
         // TODO: 7/18/2025 print bill
 
         orderManageDto.setOrderId(order.getOrderId());

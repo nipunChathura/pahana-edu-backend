@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/gcp")
+@CrossOrigin(origins = "http://localhost:4200")
 public class GCPStorageController {
 
     @Autowired

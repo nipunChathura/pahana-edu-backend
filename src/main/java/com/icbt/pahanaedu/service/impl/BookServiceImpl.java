@@ -352,7 +352,6 @@ public class BookServiceImpl implements BookService {
                     mapperDto.setAwardList(awardMapper.toDtoList(awardList));
                 }
 
-                // TODO: 7/11/2025 set promotion
                 setPromotion(mapperDto.getBookId(), book.getPrice(), mapperDto);
                 bookDetailsDtoList.add(mapperDto);
             }

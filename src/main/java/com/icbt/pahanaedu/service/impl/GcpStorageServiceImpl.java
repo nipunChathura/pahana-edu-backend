@@ -7,6 +7,7 @@ import com.icbt.pahanaedu.common.ResponseStatus;
 import com.icbt.pahanaedu.dto.GcpDto;
 import com.icbt.pahanaedu.service.GcpStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +21,8 @@ public class GcpStorageServiceImpl implements GcpStorageService {
     @Autowired
     private Storage storage;
 
-    private final String bucketName = "pahana-edu-public-bucket";
+    @Value("${public.buckert.name}")
+    private String bucketName;
 
     public void GcpStorageService() throws Exception {
         InputStream serviceAccountStream = getClass().getClassLoader()

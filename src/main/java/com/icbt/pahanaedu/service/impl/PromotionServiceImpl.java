@@ -99,15 +99,10 @@ public class PromotionServiceImpl implements PromotionService {
             log.error(LogSupport.PROMOTION_LOG + "bookIds is validation failed.", "addPromotion()", promotionManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "bookIds is validation failed.");
         }
-        System.out.println("books.size() = " + books.size());
-        books.forEach(book -> {
-            System.out.println("book = " + book);
-        });
 
-        System.out.println("promotionDto.getPromotionStartDate = " + promotionDto.getPromotionStartDate());
-        System.out.println("promotionDto.getPromotionEndDate = " + promotionDto.getPromotionEndDate());
 
         Promotion promotion = promotionMapper.toEntity(promotionDto);
+        promotion.setPromotionUrl(promotionDto.getPromotionUrl());
         promotion.setPromotionStartDate(Utils.convetPromotionDate(promotionDto.getPromotionStartDate()));
         promotion.setPromotionEndDate(Utils.convetPromotionDate(promotionDto.getPromotionEndDate()));
         promotion.setCreatedBy(promotionManageDto.getUserId());

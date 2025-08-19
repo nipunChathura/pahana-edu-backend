@@ -12,4 +12,5 @@ public class LogSupport {
     public static final String ORDER_LOG = " [{}] userId = {} customerId = {} ";
     public static final String USER_LOG = " [{}] userId = {} ";
     public static final String DASHBOARD_LOG = " [{}] userId = {} ";
+    public static final String CUSTOMER_OPEN_API = " [{}] customerId = {} ";
 }

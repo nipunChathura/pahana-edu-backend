@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findAllByEmail(String email);
+    Optional<Customer> findByEmail(String email);
     List<Customer> findAllByPhoneNumber(String phoneNumber);
     int countByCustomerRegNoStartingWith(String prefix);
 

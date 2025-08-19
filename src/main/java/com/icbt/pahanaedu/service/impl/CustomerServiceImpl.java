@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -272,5 +273,30 @@ public class CustomerServiceImpl implements CustomerService {
         customerMangeDto.setResponseMessage("Customer getting successfully");
         log.info(LogSupport.CUSTOMER_LOG + "end.", "getAllCustomer()", customerMangeDto.getUserId());
         return customerMangeDto;
+    }
+
+    @Override
+    public Customer upsert(String email, String mobileNumber, String name, String picture) {
+        Optional<Customer> byEmail = customerRepository.findByEmail(email);
+        if (byEmail.isPresent()) {
+            Customer customer = byEmail.get();
+            customer.setCustomerName(name);
+            customer.setPicture(picture);
+            return customerRepository.save(customer);
+        } else {
+            Customer customer = new Customer();
+            customer.setCustomerName(name);
+            customer.setEmail(email);
+            validatePhoneNumber(mobileNumber, null);
+            customer.setPhoneNumber(Utils.convertMobileNumber(mobileNumber));
+            customer.setPicture(picture);
+            int countToday = customerRepository.countByCustomerRegNoStartingWith(PREFIX + Utils.getCurrentDate());
+            customer.setCustomerRegNo(Utils.generateCustomerRegNumber((long) countToday));
+            customer.setStatus(Constants.ACTIVE_STATUS);
+            customer.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+            customer.setMembershipType(MembershipType.SILVER);
+
+            return customerRepository.save(customer);
+        }
     }
 }
