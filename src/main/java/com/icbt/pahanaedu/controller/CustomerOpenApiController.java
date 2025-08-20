@@ -62,4 +62,19 @@ public class CustomerOpenApiController {
 
         return response;
     }
+
+    @PostMapping("/place/order")
+    public CustomerOpenResponse placeOrder(@RequestBody CustomerOpenRequest request) {
+        CustomerOpenApiDto customerOpenApiDto = new CustomerOpenApiDto();
+        BeanUtils.copyProperties(request, customerOpenApiDto);
+
+        CustomerOpenApiDto result = customerOpenApiService.addOrder(customerOpenApiDto);
+        CustomerOpenResponse response = new CustomerOpenResponse();
+        response.setOrderId(result.getOrderId());
+        response.setStatus(result.getStatus());
+        response.setResponseCode(result.getResponseCode());
+        response.setResponseMessage(result.getResponseMessage());
+
+        return response;
+    }
 }

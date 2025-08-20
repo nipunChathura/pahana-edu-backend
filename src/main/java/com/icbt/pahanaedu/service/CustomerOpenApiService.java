@@ -7,4 +7,5 @@ public interface CustomerOpenApiService {
     CustomerOpenApiDto getCategories(CustomerOpenApiDto customerOpenApiDto);
     CustomerOpenApiDto getPromotions(CustomerOpenApiDto customerOpenApiDto);
     CustomerOpenApiDto getBooks(CustomerOpenApiDto customerOpenApiDto);
+    CustomerOpenApiDto addOrder(CustomerOpenApiDto customerOpenApiDto);
 }

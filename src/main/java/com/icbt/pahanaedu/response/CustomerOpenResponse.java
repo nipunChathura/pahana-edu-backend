@@ -1,8 +1,6 @@
 package com.icbt.pahanaedu.response;
 
-import com.icbt.pahanaedu.dto.BookDetailsDto;
-import com.icbt.pahanaedu.dto.CategoryDto;
-import com.icbt.pahanaedu.dto.PromotionDto;
+import com.icbt.pahanaedu.dto.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,4 +17,11 @@ public class CustomerOpenResponse extends Response {
 
     private BookDetailsDto bookDetail;
     private List<BookDetailsDto> bookDetailsList;
+
+    private Long orderId;
+    private Long customerId;
+    private CustomerDto customerDto;
+    private OrderDto orderDto;
+    private List<OrderDto> orderList;
+    private List<OrderDetailDto> detailDetailList;
 }

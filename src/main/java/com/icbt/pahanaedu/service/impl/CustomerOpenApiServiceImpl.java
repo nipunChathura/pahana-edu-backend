@@ -4,18 +4,15 @@ import com.icbt.pahanaedu.common.Constants;
 import com.icbt.pahanaedu.common.LogSupport;
 import com.icbt.pahanaedu.common.ResponseCodes;
 import com.icbt.pahanaedu.common.ResponseStatus;
-import com.icbt.pahanaedu.dto.BookDetailsDto;
-import com.icbt.pahanaedu.dto.CategoryDto;
-import com.icbt.pahanaedu.dto.CustomerOpenApiDto;
-import com.icbt.pahanaedu.dto.PromotionDto;
+import com.icbt.pahanaedu.dto.*;
 import com.icbt.pahanaedu.entity.*;
+import com.icbt.pahanaedu.exception.InvalidRequestException;
 import com.icbt.pahanaedu.repository.*;
 import com.icbt.pahanaedu.service.CategoryService;
 import com.icbt.pahanaedu.service.CustomerOpenApiService;
-import com.icbt.pahanaedu.util.mapper.AwardMapper;
-import com.icbt.pahanaedu.util.mapper.BookMapper;
-import com.icbt.pahanaedu.util.mapper.CategoryMapper;
-import com.icbt.pahanaedu.util.mapper.PromotionMapper;
+import com.icbt.pahanaedu.service.CustomerService;
+import com.icbt.pahanaedu.util.Utils;
+import com.icbt.pahanaedu.util.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class CustomerOpenApiServiceImpl implements CustomerOpenApiService {
@@ -57,7 +52,28 @@ public class CustomerOpenApiServiceImpl implements CustomerOpenApiService {
     private AwardMapper awardMapper;
 
     @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderMapper orderMapper;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
+
+    @Autowired
     private AwardRepository awardRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private CustomerMapper customerMapper;
+
+    @Autowired
+    private CustomerService customerService;
 
     @Value("${catrgory.icon.public.url}")
     private String CATEGORY_PUBLIC_URL;
@@ -110,6 +126,7 @@ public class CustomerOpenApiServiceImpl implements CustomerOpenApiService {
         List<PromotionDto> promotionDtoList =  new ArrayList<>();
 
         List<Promotion> all = promotionRepository.getActivePromotionNow();
+        System.out.println("all.size() = " + all.size());
         if (all.isEmpty()) {
             customerOpenApiDto.setPromotionDtoList(promotionDtoList);
             customerOpenApiDto.setStatus(ResponseStatus.SUCCESS.getStatus());
@@ -119,9 +136,10 @@ public class CustomerOpenApiServiceImpl implements CustomerOpenApiService {
         }
 
         all.forEach(promotion -> {
+            System.out.println("promotion = " + promotion);
             if (!promotion.getPromotionStatus().equalsIgnoreCase(Constants.DELETE_STATUS)) {
                 PromotionDto promotionMapperDto = promotionMapper.toDto(promotion);
-                promotionMapperDto.setPromotionUrl("/assets/scroll/scroll_4.jpg");
+                System.out.println("promotionMapperDto = " + promotionMapperDto);
                 if (customerOpenApiDto.isRequestBookDetails()) {
                     List<PromotionBook> promotionBooks = promotionBookRepository.findAllByPromotion(promotion);
                     if (!promotionBooks.isEmpty()) {
@@ -191,6 +209,166 @@ public class CustomerOpenApiServiceImpl implements CustomerOpenApiService {
         customerOpenApiDto.setBookDetailsList(bookDetailsDtoList);
         log.info(LogSupport.CUSTOMER_OPEN_API + "ending.", "getBooks()", customerId);
         return customerOpenApiDto;
+    }
+
+    @Override
+    public CustomerOpenApiDto addOrder(CustomerOpenApiDto customerOpenApiDto) {
+        log.info(LogSupport.CUSTOMER_OPEN_API + "starting.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+
+        if (customerOpenApiDto.getOrderDto() == null) {
+            log.error(LogSupport.CUSTOMER_OPEN_API + "order data is required.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "order data is required");
+        }
+        OrderDto orderDto = customerOpenApiDto.getOrderDto();
+
+        boolean guestCustomer = false;
+        Customer customer = null;
+
+        if (customerOpenApiDto.getCustomerId() == null) {
+            if (customerOpenApiDto.getCustomerDto() == null) {
+                log.error(LogSupport.CUSTOMER_OPEN_API + "customer data is required.", "addOrder()", customerOpenApiDto.getCustomerId(), null);
+                throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "customer data is required");
+            } else {
+                String mobileNumber = Utils.convertMobileNumber(customerOpenApiDto.getCustomerDto().getPhoneNumber());
+                List<Customer> customerList = customerRepository.findAllByPhoneNumber(mobileNumber);
+                if (!customerList.isEmpty()) {
+                    customer =  customerList.get(0);
+                } else {
+                    guestCustomer = true;
+                }
+            }
+        } else {
+            Optional<Customer> byId = customerRepository.findById(customerOpenApiDto.getCustomerId());
+            if (byId.isEmpty()) {
+                log.error(LogSupport.CUSTOMER_OPEN_API + "customerId is invalid.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+                throw new InvalidRequestException(ResponseCodes.INVALID_CUSTOMER_ID_CODE, "customer Id is invalid");
+            }
+            customer = byId.get();
+        }
+
+        if (guestCustomer) {
+            CustomerDto customerDto = customerOpenApiDto.getCustomerDto();
+            CustomerMangeDto customerMangeDto = new CustomerMangeDto();
+            customerMangeDto.setCustomerDto(customerDto);
+            CustomerMangeDto result = customerService.addCustomer(customerMangeDto);
+            if (result.getStatus().equalsIgnoreCase(ResponseStatus.SUCCESS.getStatus())) {
+                Optional<Customer> byId = customerRepository.findById(result.getCustomerId());
+                if (byId.isPresent()) {
+                    customer = byId.get();
+                } else {
+                    log.error(LogSupport.CUSTOMER_OPEN_API + "technical error.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+                    throw new InvalidRequestException(ResponseCodes.TECHNICAL_ERROR_CODE, "Technical Error Please Try Again Later");
+                }
+            } else {
+                log.error(LogSupport.CUSTOMER_OPEN_API + "technical error.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+                throw new InvalidRequestException(ResponseCodes.TECHNICAL_ERROR_CODE, "Technical Error Please Try Again Later");
+            }
+        }
+
+
+        if (orderDto.getPaidAmount() == null) {
+            log.error(LogSupport.CUSTOMER_OPEN_API + "paidAmount is required.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "paidAmount is required");
+        }
+
+        if (orderDto.getPaymentType() == null || orderDto.getPaymentType().isEmpty()) {
+            log.error(LogSupport.CUSTOMER_OPEN_API + "paymentType is required.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "paymentType is required");
+        }
+
+        if (orderDto.getOrderDetailDtos() == null || orderDto.getOrderDetailDtos().isEmpty()) {
+            log.error(LogSupport.CUSTOMER_OPEN_API + "orderDetail is required.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "orderDetail is required");
+        }
+
+        List<OrderDetails> orderDetails = new ArrayList<>();
+
+        List<OrderDetailDto> orderDetailsDto = orderDto.getOrderDetailDtos();
+        OrderDetails details = null;
+        for (int i = 0; i < orderDetailsDto.size(); i++) {
+            details = validateOrderDetails(orderDetailsDto.get(i), customer.getCustomerId(), i + 1);
+            details.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+            orderDetails.add(details);
+        }
+
+        Order order = orderMapper.toEntity(orderDto);
+        order.setCustomer(customer);
+        order.setOrderDate(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+        order.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+
+        orderRepository.save(order);
+        Long orderId = order.getOrderId();
+        System.out.println("orderId = " + orderId);
+
+        orderDetails.forEach(orderDetail -> {
+            Book book = orderDetail.getBook();
+            Long bookStock = book.getQuantity();
+            Integer orderQuantity = orderDetail.getItemQuantity();
+            book.setQuantity(bookStock - orderQuantity);
+            book.setModifiedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+            // update book stock
+            bookRepository.save(book);
+
+            orderDetail.setOrder(order);
+            orderDetail.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+            orderDetailRepository.save(orderDetail);
+        });
+
+        System.out.println("orderId = " + orderId);
+
+        // TODO: 7/18/2025 print bill
+
+        customerOpenApiDto.setOrderId(order.getOrderId());
+        customerOpenApiDto.setStatus(ResponseStatus.SUCCESS.getStatus());
+        customerOpenApiDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
+        customerOpenApiDto.setResponseMessage("Order saving successfully");
+        log.info(LogSupport.CUSTOMER_OPEN_API + "end.", "addOrder()", customerOpenApiDto.getCustomerId(), customerOpenApiDto.getCustomerId());
+        return customerOpenApiDto;
+    }
+
+    private OrderDetails validateOrderDetails(OrderDetailDto orderDetailDto, Long customerId, int sequence) {
+        if (orderDetailDto.getBookId() == null) {
+            log.error(LogSupport.ORDER_LOG + sequence +" = bookId is required.", "addOrder()", null, customerId);
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, sequence +" = bookId is required");
+        }
+
+        Optional<Book> optionalBook = bookRepository.findById(orderDetailDto.getBookId());
+        if (optionalBook.isEmpty()) {
+            log.error(LogSupport.ORDER_LOG + "invalid bookId.", "addOrder()", null, customerId);
+            throw new InvalidRequestException(ResponseCodes.INVALID_BOOK_ID_CODE, "Invalid Book Id");
+        }
+
+        if (orderDetailDto.getItemQuantity() == null) {
+            log.error(LogSupport.ORDER_LOG + sequence +" = itemQuantity is required.", "addOrder()", null, customerId);
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, sequence +" = itemQuantity is required");
+        }
+
+        Book book = optionalBook.get();
+        if (book.getQuantity() <= orderDetailDto.getItemQuantity()) {
+            log.error(LogSupport.ORDER_LOG + sequence +" = book quantity exceed", "addOrder()", null, customerId);
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, sequence +" = book quantity exceed");
+        }
+
+        OrderDetails details = orderDetailMapper.toEntity(orderDetailDto);
+        details.setBook(book);
+
+        if (orderDetailDto.getPromotionId() != null) {
+            Optional<Promotion> byId = promotionRepository.findById(orderDetailDto.getPromotionId());
+            if (byId.isEmpty()) {
+                log.error(LogSupport.ORDER_LOG + sequence +" = invalid promotionId.", "addOrder()", null, customerId);
+                throw new InvalidRequestException(ResponseCodes.INVALID_PROMOTION_ID_CODE, sequence +" = invalid promotion id");
+            }
+
+            Promotion promotion = byId.get();
+            Date currentDatetime = Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE);
+            if (currentDatetime.after(promotion.getPromotionEndDate())
+                    || currentDatetime.before(promotion.getPromotionStartDate())) {
+                log.error(LogSupport.ORDER_LOG + sequence +" = invalid promotion date range.", "addOrder()", null, customerId);
+                throw new InvalidRequestException(ResponseCodes.INVALID_PROMOTION_ID_CODE, sequence +" = invalid promotion date range");
+            }
+            details.setPromotion(promotion);
+        }
+        return details;
     }
 
     private List<Book> getBooksByPromotion(CustomerOpenApiDto customerOpenApiDto) {

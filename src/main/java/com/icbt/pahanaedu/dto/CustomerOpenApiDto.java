@@ -16,6 +16,13 @@ public class CustomerOpenApiDto extends CommonDto {
     private String requestType;
     private Long requestId;
 
+    private Long orderId;
+
+    private CustomerDto customerDto;
+    private OrderDto orderDto;
+    private List<OrderDto> orderList;
+    private List<OrderDetailDto> detailDetailList;
+
 //    response
     private CategoryDto categoryDetail;
     private List<CategoryDto> categoryDetailsList;
