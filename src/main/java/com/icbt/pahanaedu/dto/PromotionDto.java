@@ -22,6 +22,7 @@ public class PromotionDto {
     private BigDecimal promotionPrice;
     private Integer priority;
     private String promotionStatus;
+    private String promotionUrl;
     private List<Long> bookIds;
     private List<BookDetailsDto> bookDetailsDtoList;
 }

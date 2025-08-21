@@ -155,6 +155,7 @@ public class AuthServiceImpl implements AuthService {
         authDetailsDto.setUserId(user.getUserId());
         authDetailsDto.setToken(token);
         authDetailsDto.setRole(user.getRole());
+        authDetailsDto.setUsername(user.getUsername());
         authDetailsDto.setStatus(ResponseStatus.SUCCESS.getStatus());
         authDetailsDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
         authDetailsDto.setResponseMessage("User login successfully");

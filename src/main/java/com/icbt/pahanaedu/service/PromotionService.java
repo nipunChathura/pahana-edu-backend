@@ -6,6 +6,7 @@ public interface PromotionService {
     PromotionManageDto addPromotion(PromotionManageDto promotionManageDto);
     PromotionManageDto updatePromotion(PromotionManageDto promotionManageDto);
     PromotionManageDto getByPromotionId(PromotionManageDto promotionManageDto);
+    PromotionManageDto deletePromotion(PromotionManageDto promotionManageDto);
     PromotionManageDto getAllPromotion(PromotionManageDto promotionManageDto);
     PromotionManageDto addBookByExistingPromotion(PromotionManageDto promotionManageDto);
     PromotionManageDto removeBookByExistingPromotion(PromotionManageDto promotionManageDto);

@@ -207,4 +207,32 @@ public class CategoryServiceImpl implements CategoryService {
         log.info(LogSupport.CATEGORY_LOG + "end.", "getCategories()", categoryManageDto.getUserId());
         return categoryManageDto;
     }
+
+    @Override
+    public CategoryManageDto getCategoriesByStatus(CategoryManageDto categoryManageDto) {
+        log.info(LogSupport.CATEGORY_LOG + "starting.", "getCategoriesByStatus()", categoryManageDto.getUserId());
+
+        List<CategoryDto> categoryDtos = new ArrayList<>();
+
+        List<Category> categories = categoryRepository.findAllByCategoryStatus(categoryManageDto.getCategoryStatus());
+        if (categories.isEmpty()) {
+            log.info(LogSupport.CATEGORY_LOG + "categories is empty.", "getCategoriesByStatus()", categoryManageDto.getUserId());
+            categoryManageDto.setCategoryDetailsList(categoryDtos);
+            categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
+            categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
+            categoryManageDto.setResponseMessage("Category getting successfully");
+            return categoryManageDto;
+        }
+
+        categories.forEach(category -> {
+            categoryDtos.add(categoryMapper.toDto(category));
+        });
+
+        categoryManageDto.setCategoryDetailsList(categoryDtos);
+        categoryManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
+        categoryManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
+        categoryManageDto.setResponseMessage("Category getting successfully");
+        log.info(LogSupport.CATEGORY_LOG + "end.", "getCategoriesByStatus()", categoryManageDto.getUserId());
+        return categoryManageDto;
+    }
 }

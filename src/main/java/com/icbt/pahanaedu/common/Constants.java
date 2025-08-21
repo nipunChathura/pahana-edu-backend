@@ -28,4 +28,9 @@ public class Constants {
     public final static String USER_INACTIVE_STATUS = "INACTIVE";
     public final static String USER_BLOCKED_STATUS = "BLOCKED";
     public final static String USER_DELETE_STATUS = "DELETE";
+
+
+    // Customer Open APIs
+    public final static String PROMOTION_REQUEST_TYPE = "PROMOTION";
+    public final static String CATEGORY_REQUEST_TYPE = "CATEGORY";
 }
