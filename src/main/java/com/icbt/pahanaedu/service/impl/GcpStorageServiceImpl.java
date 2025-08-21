@@ -20,7 +20,8 @@ import java.util.UUID;
 @Service
 public class GcpStorageServiceImpl implements GcpStorageService {
 
-    @Autowired
+    // TODO: 8/21/2025 uncomment
+//    @Autowired
     private Storage storage;
 
     @Value("${public.buckert.name}")
