@@ -12,9 +12,16 @@ import java.util.List;
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
     @Query("select p from Promotion p " +
-            "    inner join PromotionBook pb on p.promotionId = pb.promotionBookId " +
+            "    inner join PromotionBook pb on p.promotionId = pb.promotion.promotionId " +
             "where pb.book.bookId = :bookId and p.promotionStatus = 'ACTIVE' " +
             "    and current_timestamp between p.promotionStartDate and p.promotionEndDate " +
             "    order by p.createdDatetime")
     List<Promotion> getActivePromotionByBookNow(@Param("bookId") Long bookId);
+
+    @Query("select p from Promotion p " +
+            "    inner join PromotionBook pb on p.promotionId = pb.promotion.promotionId " +
+            "where p.promotionStatus = 'ACTIVE' " +
+            "    and current_timestamp between p.promotionStartDate and p.promotionEndDate " +
+            "    order by p.createdDatetime")
+    List<Promotion> getActivePromotionNow();
 }

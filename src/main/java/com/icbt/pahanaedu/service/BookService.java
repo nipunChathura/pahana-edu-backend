@@ -9,4 +9,5 @@ public interface BookService {
     public BookManageDto getBookById(BookManageDto bookManageDto);
     public BookManageDto getBooks(BookManageDto bookManageDto);
     public BookManageDto searchBooks(BookManageDto bookManageDto);
+    public BookManageDto deleteBooks(BookManageDto bookManageDto);
 }

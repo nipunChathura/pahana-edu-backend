@@ -11,10 +11,10 @@ public class PromotionBook {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "promotion_book_id")
     private Long promotionBookId;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "promotion_id")
     private Promotion promotion;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
     @Column(name = "status")

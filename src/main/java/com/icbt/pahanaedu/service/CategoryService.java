@@ -8,4 +8,5 @@ public interface CategoryService {
     public CategoryManageDto deleteCategory(CategoryManageDto categoryManageDto);
     public CategoryManageDto getCategoryById(CategoryManageDto categoryManageDto);
     public CategoryManageDto getCategories(CategoryManageDto categoryManageDto);
+    public CategoryManageDto getCategoriesByStatus(CategoryManageDto categoryManageDto);
 }

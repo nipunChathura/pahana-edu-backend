@@ -28,4 +28,6 @@ public class Promotion extends AbstractEntity {
     private Integer priority;
     @Column(name = "promotion_status", nullable = false)
     private String promotionStatus;
+    @Column(name = "promotion_url")
+    private String promotionUrl;
 }

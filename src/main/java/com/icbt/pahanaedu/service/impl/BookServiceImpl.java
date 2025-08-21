@@ -4,6 +4,7 @@ import com.icbt.pahanaedu.common.Constants;
 import com.icbt.pahanaedu.common.LogSupport;
 import com.icbt.pahanaedu.common.ResponseCodes;
 import com.icbt.pahanaedu.common.ResponseStatus;
+import com.icbt.pahanaedu.dto.AwardDto;
 import com.icbt.pahanaedu.dto.BookDetailsDto;
 import com.icbt.pahanaedu.dto.BookManageDto;
 import com.icbt.pahanaedu.entity.Award;
@@ -121,6 +122,7 @@ public class BookServiceImpl implements BookService {
         }
 
         Book book = bookMapper.toEntity(bookDetailsDto);
+        book.setLoadingQuantity(book.getQuantity());
         book.setCategory(category);
         book.setBookStatus(Constants.ACTIVE_STATUS);
         book.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
@@ -223,8 +225,23 @@ public class BookServiceImpl implements BookService {
             log.error(LogSupport.BOOK_LOG + "quantity is required.", "updateBook()", bookManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "quantity is required");
         }
+        Book book = optionalBook.get();
+        if (!bookDetailsDto.getAwardList().isEmpty()) {
+            List<Award> awardList = awardRepository.findByBook(book);
+            awardRepository.deleteAll(awardList);
+            List<AwardDto> awardDtos = bookDetailsDto.getAwardList();
+            awardDtos.forEach(awardDto -> {
+                Award award = awardMapper.toEntity(awardDto);
+                award.setAwardId(null);
+                award.setBook(book);
+                award.setCreatedBy(bookManageDto.getUserId());
+                award.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
 
-        Book book = bookMapper.toEntity(bookDetailsDto);
+                awardRepository.save(award);
+            });
+        }
+
+        mappingUpdateBook(book, bookDetailsDto);
         book.setCategory(category);
         book.setModifiedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
 
@@ -240,11 +257,24 @@ public class BookServiceImpl implements BookService {
         return bookManageDto;
     }
 
+    private void mappingUpdateBook(Book book, BookDetailsDto bookDetailsDto) {
+        book.setName(bookDetailsDto.getName());
+        book.setDescription(bookDetailsDto.getDescription());
+        book.setAuthor(bookDetailsDto.getAuthor());
+        book.setLanguage(bookDetailsDto.getLanguage());
+        book.setPublisher(bookDetailsDto.getPublisher());
+        book.setPublishDate(bookDetailsDto.getPublishDate());
+        book.setIsbn(bookDetailsDto.getIsbn());
+        book.setPrice(bookDetailsDto.getPrice());
+        book.setQuantity(bookDetailsDto.getQuantity());
+        book.setImageUrl(bookDetailsDto.getImageUrl());
+    }
+
     @Override
     public BookManageDto getBookById(BookManageDto bookManageDto) {
         log.info(LogSupport.BOOK_LOG + "starting.", "getBookById()", bookManageDto.getUserId());
         if (bookManageDto.getBookDetail() == null) {
-            log.error(LogSupport.BOOK_LOG + "book data is required.", "addBook()", bookManageDto.getUserId());
+            log.error(LogSupport.BOOK_LOG + "book data is required.", "getBookById()", bookManageDto.getUserId());
             throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "book data is required");
         }
         BookDetailsDto bookDetailsDto = bookManageDto.getBookDetail();
@@ -322,7 +352,6 @@ public class BookServiceImpl implements BookService {
                     mapperDto.setAwardList(awardMapper.toDtoList(awardList));
                 }
 
-                // TODO: 7/11/2025 set promotion
                 setPromotion(mapperDto.getBookId(), book.getPrice(), mapperDto);
                 bookDetailsDtoList.add(mapperDto);
             }
@@ -340,5 +369,37 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookManageDto searchBooks(BookManageDto bookManageDto) {
         return null;
+    }
+
+    @Override
+    public BookManageDto deleteBooks(BookManageDto bookManageDto) {
+        log.info(LogSupport.BOOK_LOG + "starting.", "deleteBooks()", bookManageDto.getUserId());
+        if (bookManageDto.getBookDetail() == null) {
+            log.error(LogSupport.BOOK_LOG + "book data is required.", "deleteBooks()", bookManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "book data is required");
+        }
+        BookDetailsDto bookDetailsDto = bookManageDto.getBookDetail();
+
+        if (bookDetailsDto.getBookId() == null) {
+            log.error(LogSupport.BOOK_LOG + "bookId is required.", "deleteBooks()", bookManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.MISSING_PARAMETER_CODE, "bookId is required");
+        }
+
+        Optional<Book> optionalBook = bookRepository.findById(bookDetailsDto.getBookId());
+        if (optionalBook.isEmpty()) {
+            log.error(LogSupport.BOOK_LOG + "invalid bookId.", "deleteBooks()", bookManageDto.getUserId());
+            throw new InvalidRequestException(ResponseCodes.INVALID_BOOK_ID_CODE, "Invalid Book Id");
+        }
+
+        Book book = optionalBook.get();
+        book.setBookStatus(Constants.DELETE_STATUS);
+        bookRepository.save(book);
+
+        bookManageDto.setStatus(ResponseStatus.SUCCESS.getStatus());
+        bookManageDto.setResponseCode(ResponseCodes.SUCCESS_CODE);
+        bookManageDto.setResponseMessage("Book delete successfully");
+
+        log.info(LogSupport.BOOK_LOG + "end.", "deleteBooks()", bookManageDto.getUserId());
+        return bookManageDto;
     }
 }

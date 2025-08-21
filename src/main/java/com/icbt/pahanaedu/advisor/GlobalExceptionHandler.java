@@ -48,6 +48,4 @@ public class GlobalExceptionHandler {
         response.setResponseCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         return response;
     }
-
-
 }

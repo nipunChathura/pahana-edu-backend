@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/promotions")
+@CrossOrigin(origins = "http://localhost:4200")
 public class PromotionController {
 
     @Autowired
@@ -57,6 +58,20 @@ public class PromotionController {
         PromotionManageDto result = promotionService.getByPromotionId(promotionManageDto);
         PromotionResponse response = new PromotionResponse();
         response.setPromotionDto(result.getPromotionDto());
+        response.setStatus(result.getStatus());
+        response.setResponseCode(result.getResponseCode());
+        response.setResponseMessage(result.getResponseMessage());
+
+        return response;
+    }
+
+    @DeleteMapping("/delete")
+    public PromotionResponse deletePromotion(@RequestBody PromotionRequest request) {
+        PromotionManageDto promotionManageDto = new PromotionManageDto();
+        BeanUtils.copyProperties(request, promotionManageDto);
+
+        PromotionManageDto result = promotionService.deletePromotion(promotionManageDto);
+        PromotionResponse response = new PromotionResponse();
         response.setStatus(result.getStatus());
         response.setResponseCode(result.getResponseCode());
         response.setResponseMessage(result.getResponseMessage());
