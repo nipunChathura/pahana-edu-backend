@@ -5,4 +5,12 @@ public class LogSupport {
 
     public static final String USER_REGISTER = " [register()] username = {} ";
     public static final String USER_LOGIN = " [login()] username = {} ";
+    public static final String BOOK_LOG = " [{}] userId = {} ";
+    public static final String CATEGORY_LOG = " [{}] userId = {} ";
+    public static final String PROMOTION_LOG = " [{}] userId = {} ";
+    public static final String CUSTOMER_LOG = " [{}] userId = {} ";
+    public static final String ORDER_LOG = " [{}] userId = {} customerId = {} ";
+    public static final String USER_LOG = " [{}] userId = {} ";
+    public static final String DASHBOARD_LOG = " [{}] userId = {} ";
+    public static final String CUSTOMER_OPEN_API = " [{}] customerId = {} ";
 }
