@@ -12,8 +12,9 @@ import java.io.InputStream;
 public class GcpStorageConfig {
     @Bean
     public Storage storage() throws Exception {
+        // TODO: 8/21/2025 Added GCP Json file  
         InputStream serviceAccountStream = getClass().getClassLoader()
-                .getResourceAsStream("pahana-edu-468718-a1cd1775c486.json");
+                .getResourceAsStream("*");
 
         if (serviceAccountStream == null) {
             throw new RuntimeException("Service account JSON file not found in resources folder");
