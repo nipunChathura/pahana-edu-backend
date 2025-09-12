@@ -27,16 +27,6 @@ public class GcpStorageServiceImpl implements GcpStorageService {
     @Value("${public.buckert.name}")
     private String bucketName;
 
-    public void GcpStorageService() throws Exception {
-        InputStream serviceAccountStream = getClass().getClassLoader()
-                .getResourceAsStream("service-account-file.json");
-
-        storage =  StorageOptions.newBuilder()
-                .setCredentials(ServiceAccountCredentials.fromStream(serviceAccountStream))
-                .build()
-                .getService();
-    }
-
     @Override
     public GcpDto uploadFile(GcpDto gcpDto) {
         MultipartFile file = gcpDto.getFile();
@@ -67,7 +57,7 @@ public class GcpStorageServiceImpl implements GcpStorageService {
         Storage storage;
         try {
             // Load service account key from resources folder
-            InputStream serviceAccount = getClass().getResourceAsStream("/pahana-edu-468718-a1cd1775c486.json");
+            InputStream serviceAccount = getClass().getResourceAsStream("/metal-episode-471915-i5-e828e70c58aa.json");
             if (serviceAccount == null) {
                 throw new FileNotFoundException("Service account file not found in resources");
             }
