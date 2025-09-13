@@ -288,6 +288,9 @@ public class CustomerOpenApiServiceImpl implements CustomerOpenApiService {
         for (int i = 0; i < orderDetailsDto.size(); i++) {
             details = validateOrderDetails(orderDetailsDto.get(i), customer.getCustomerId(), i + 1);
             details.setCreatedDatetime(Utils.getCurrentDateByTimeZone(Constants.TIME_ZONE));
+            if (details.getPromotion() == null) {
+                details.setDiscountPrice(BigDecimal.ZERO);
+            }
             orderDetails.add(details);
         }
 
